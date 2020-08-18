@@ -1,9 +1,11 @@
 import pyowm
+import os
 import telebot
 import test_telebot.test_telebot.basedate as basedate
 from telebot import types
 
 
+token = os.getenv("TOKEN")
 owm = pyowm.OWM('599a020b0f5dd1fbda37da885fd05d09', language = "ru")
 bot = telebot.TeleBot("1222661818:AAGegQC8g16wOeXX2mFV4ooEddDoXEISb0c")
 

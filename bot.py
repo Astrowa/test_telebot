@@ -1,6 +1,6 @@
 import pyowm
 import telebot
-import bd
+import test_telebot.test_telebot.basedate as basedate
 from telebot import types
 
 
@@ -36,7 +36,7 @@ def send_simpe_echo(message):
 		#send = bot.send_message(message.chat.id, 'Введите название города или "город, страна"')
 		bot.register_next_step_handler(send, send_weather)
 	elif message.text.lower() == 'стикер':
-		keks = bd.random_sticker()
+		keks = basedate.random_sticker()
 		print(keks)
 		print(type(keks))
 		bot.send_sticker(message.chat.id, keks[0])
@@ -54,7 +54,7 @@ def send_weather(message):
 			temp = w.get_temperature('celsius')["temp"]
 			cous = observation.get_location()
 			print(cous)
-			LATITUDE = cous.get_lat()#каеф. получилось достать lat
+			LATITUDE = cous.get_lat()#получилось достать lat
 			LONGITUDE = cous.get_lon()
 			print(LATITUDE)
 			print(LONGITUDE)
@@ -77,14 +77,27 @@ def send_weather(message):
 
 @bot.message_handler(content_types=['sticker'])
 def send_sticker(message):
-	print(message)
-	print(type(message))
-	update_table = message.sticker.file_id
-	t = (update_table,)
+	bd_list_all = basedate.read_sql()
+	print(message)#нужно читать БД только при запуске, а не каждый раз при добавлении
+	print(type(message))#возможно стоило объявить список глобальным
+	update_table = message.sticker.file_id#похоже нужно ещё брать уникальный код файла
+	unique_id = message.json['sticker']['thumb']['file_unique_id']
+	print('Уникальный', unique_id)
+	t = [[update_table, unique_id]]
 	print(update_table)
 	print(t)
 	print(type(t))
-	bd.sql_function(t)
+	print(bd_list_all)
+	print('fgfg', type(bd_list_all))
+	print(len(bd_list_all))
+	check = 0
+	for i in range(len(bd_list_all)):
+		if bd_list_all[i][1] == unique_id:#file_unique_id всегда одинаковый, а sticker.file_id разный
+			check += 1
+	if check == 1:
+		print('Такой стикер уже есть')
+	else:
+		basedate.sql_function(t)
 	#нужно замутить БД с id стикеров, чтобы потом из неё выбирать рандомный
 
 
@@ -109,7 +122,8 @@ def send_location(message):
 	#нужно перенести исполнение после нажатия на кнопку погода
 
 #подсказку на неопознаные команды
-#bot.send_message("1222661818:AAGegQC8g16wOeXX2mFV4ooEddDoXEISb0c",'Напиши /start')
+
+
 
 bot.polling( none_stop = True)
 

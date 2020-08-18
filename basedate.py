@@ -4,7 +4,7 @@ import random
 '''conn = sqlite3.connect("mydatabase.db")  # или :memory: чтобы сохранить в RAM
 cursor = conn.cursor()
 cursor.execute("""CREATE TABLE Sticker
-                  (Sticker_id text)
+                  (Sticker_id text, Unique_id_code)
                """)'''
 
 def random_sticker():
@@ -22,7 +22,7 @@ def random_sticker():
 def sql_function(update_table):
     conn = sqlite3.connect("mydatabase.db")  # или :memory: чтобы сохранить в RAM
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO Sticker VALUES (?)", (update_table))
+    cursor.executemany("INSERT INTO Sticker VALUES (?,?)", (update_table))
     conn.commit()
     conn.close()
 
@@ -32,13 +32,20 @@ def read_sql():
     cursor = conn.cursor()
     sql = "SELECT * FROM Sticker"
     cursor.execute(sql)
-    print(cursor.fetchall())
+    all_list = cursor.fetchall()
     conn.close()
+    #check_reading()попытка чека прочтения
+    return all_list
 
+
+'''def check_reading():
+    global basedate_check_reading
+    basedate_check_reading = 1
+    return basedate_check_reading'''
 
 #sql_function()
-read_sql()
-
+#basedate_check_reading = 0
+#bd_list_all = read_sql()
 
 
 # print(type(Sticker))

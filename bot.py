@@ -102,7 +102,6 @@ def send_sticker(message):
 		print('Такой стикер уже есть')
 	else:
 		basedate.sql_function(t)
-	#нужно замутить БД с id стикеров, чтобы потом из неё выбирать рандомный
 
 
 

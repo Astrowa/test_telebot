@@ -4,8 +4,9 @@ import test_telebot.test_telebot.basedate as basedate
 from telebot import types
 
 
+
 owm = pyowm.OWM('599a020b0f5dd1fbda37da885fd05d09', language = "ru")
-bot = telebot.TeleBot("1200653897:AAFRm8uniNiz8oLPJy7nLvDh3kIQF_O3nEE")
+bot = telebot.TeleBot("1222661818:AAGegQC8g16wOeXX2mFV4ooEddDoXEISb0c")#надо не забывать менять на фейк
 
 
 
@@ -33,7 +34,6 @@ def send_simpe_echo(message):
 		# itembtn5 = types.KeyboardButton('Выход')
 		markup1.add(itembtn4)
 		send = bot.send_message(message.chat.id, 'Введите название города', reply_markup=markup1)
-		#send = bot.send_message(message.chat.id, 'Введите название города или "город, страна"')
 		bot.register_next_step_handler(send, send_weather)
 	elif message.text.lower() == 'стикер':
 		keks = basedate.random_sticker()
@@ -47,31 +47,35 @@ def send_weather(message):
 	if message.text == 'Выход':
 		welcome(message)
 	else:
-		try:
-			observation = owm.weather_at_place(message.text)
-			w = observation.get_weather()
-			print(w)
-			temp = w.get_temperature('celsius')["temp"]
-			cous = observation.get_location()
-			print(cous)
-			LATITUDE = cous.get_lat()#получилось достать lat
-			LONGITUDE = cous.get_lon()
-			print(LATITUDE)
-			print(LONGITUDE)
-			print(message.chat.id)
-			bot.send_location(message.chat.id, LATITUDE, LONGITUDE)
-			#bot.send_location(message.chat_id, cous.lat, cous.lon)
-			#как-то вытащить lat и lon с cous - это координаты на геометку
+		if message.content_type == 'text':
+			try:
+				print(message)
+				print(message.content_type)
+				observation = owm.weather_at_place(message.text)
+				w = observation.get_weather()
+				print(w)
+				temp = w.get_temperature('celsius')["temp"]
+				cous = observation.get_location()
+				print(cous)
+				LATITUDE = cous.get_lat()  # получилось достать lat
+				LONGITUDE = cous.get_lon()
+				print(LATITUDE)
+				print(LONGITUDE)
+				print(message.chat.id)
+				bot.send_location(message.chat.id, LATITUDE, LONGITUDE)
+				# bot.send_location(message.chat_id, cous.lat, cous.lon)
+				# как-то вытащить lat и lon с cous - это координаты на геометку
 
-			answer = "В городе " + message.text + " сейчас " + w.get_detailed_status() + "\n"
-			answer += "Температура: " + str(temp) + "\n\n"
+				answer = "В городе " + message.text + " сейчас " + w.get_detailed_status() + "\n"
+				answer += "Температура: " + str(temp) + "\n\n"
 
-			bot.send_message(message.chat.id, answer)
-			welcome(message)
-		except:
-			send = bot.send_message(message.chat.id, 'Напиши название города правильно')
-			bot.register_next_step_handler(send, send_weather)
-			#можно зациклить обратно функцию и добавить кнопку выхода
+				bot.send_message(message.chat.id, answer)
+				welcome(message)
+			except:
+				send = bot.send_message(message.chat.id, 'Напиши название города правильно')
+				bot.register_next_step_handler(send, send_weather)
+		elif message.content_type == 'location':
+			send_location(message)
 
 
 
@@ -122,7 +126,6 @@ def send_location(message):
 	#нужно перенести исполнение после нажатия на кнопку погода
 
 #подсказку на неопознаные команды
-
 
 
 bot.polling( none_stop = True)
